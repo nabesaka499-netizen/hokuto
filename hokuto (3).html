@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="北斗転生2">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="manifest" href="manifest.json">
+<title>北斗転生2 示唆メモ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  background: linear-gradient(160deg, #0a0a0f 0%, #0f0a1a 50%, #0a0f0a 100%);
+  min-height: 100vh; color: #e8e0d0; padding-bottom: 60px;
+}
+
+/* ===== HEADER ===== */
+header {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(10,10,15,0.98);
+  border-bottom: 1px solid rgba(255,180,0,0.3);
+  text-align: center; padding: 8px;
+  font-size: 11px; letter-spacing: 3px; color: #c8a84b; font-weight: bold;
+}
+
+/* ===== LIVE LOG (常時表示) ===== */
+.live-log-wrap {
+  position: sticky; top: 33px; z-index: 29;
+  background: rgba(12,12,20,0.98);
+  border-bottom: 2px solid rgba(255,215,0,0.2);
+  padding: 6px 10px;
+}
+.live-log-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+}
+.live-log-title { font-size: 10px; font-weight: bold; color: #c8a84b; letter-spacing: 2px; }
+.live-log-btns { display: flex; gap: 5px; }
+.btn-ll-copy {
+  background: rgba(0,200,80,0.2); border: 1px solid rgba(0,200,80,0.4);
+  color: #4ade80; border-radius: 6px; padding: 3px 8px;
+  font-size: 10px; font-weight: bold; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-ll-undo {
+  background: rgba(255,165,0,0.2); border: 1px solid rgba(255,165,0,0.4);
+  color: #fbbf24; border-radius: 6px; padding: 3px 8px;
+  font-size: 10px; font-weight: bold; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-ll-clr {
+  background: rgba(200,80,80,0.2); border: 1px solid rgba(200,80,80,0.3);
+  color: #ff9090; border-radius: 6px; padding: 3px 8px;
+  font-size: 10px; font-weight: bold; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.live-log-area {
+  max-height: 90px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.ll-item {
+  font-size: 11px; font-family: monospace;
+  padding: 3px 8px; border-radius: 5px; word-break: break-all;
+}
+.ll-new  { background: rgba(255,215,0,0.1); border-left: 2px solid #ffd700; color: #ffd700; }
+.ll-none { background: rgba(60,60,60,0.3);  border-left: 2px solid #555;    color: #777; }
+.ll-rare { background: rgba(30,120,50,0.2); border-left: 2px solid #4ade80; color: #86efac; }
+.ll-old  { background: rgba(255,255,255,0.03); border-left: 2px solid #333; color: #666; }
+.ll-empty { font-size: 11px; color: #444; text-align: center; padding: 6px; }
+
+/* ===== TABS ===== */
+.tab-bar {
+  display: flex; position: sticky; top: 33px; z-index: 20;
+  background: rgba(10,10,15,0.97);
+  border-bottom: 2px solid rgba(255,255,255,0.08);
+}
+.tab-btn {
+  flex: 1; padding: 12px 4px; font-size: 13px; font-weight: bold;
+  border: none; cursor: pointer; background: transparent; color: #444;
+  letter-spacing: 1px; border-bottom: 3px solid transparent; margin-bottom: -2px;
+  -webkit-tap-highlight-color: transparent; transition: all 0.2s;
+}
+.tab-btn.act-s { color: #fb923c; border-bottom-color: #fb923c; }
+.tab-btn.act-a { color: #22d3ee; border-bottom-color: #22d3ee; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.container { max-width: 480px; margin: 0 auto; padding: 10px; }
+.card { border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+.c-s   { background: rgba(249,115,22,0.07);  border: 1px solid rgba(249,115,22,0.35); }
+.c-a   { background: rgba(34,211,238,0.07);  border: 1px solid rgba(34,211,238,0.35); }
+.c-pur { background: rgba(180,100,255,0.06); border: 1px solid rgba(180,100,255,0.3); }
+.c-gry { background: rgba(60,60,60,0.15);    border: 1px solid rgba(120,120,120,0.25); }
+.c-red { background: rgba(150,20,20,0.22);   border: 1px solid rgba(200,50,50,0.45); }
+.c-yel { background: rgba(120,100,0,0.22);   border: 1px solid rgba(200,160,0,0.45); }
+.c-blu { background: rgba(20,40,120,0.22);   border: 1px solid rgba(50,80,200,0.45); }
+
+/* ===== COUNTER ===== */
+.cnt { font-size: 68px; font-weight: 900; line-height: 1; letter-spacing: -2px; text-align: center; }
+.cnt-s { color: #fb923c; text-shadow: 0 0 28px rgba(251,146,60,0.45); }
+.cnt-a { color: #22d3ee; text-shadow: 0 0 28px rgba(34,211,238,0.45); }
+.cnt-lbl { text-align: center; font-size: 11px; color: #777; margin: 2px 0 10px; }
+.sec-lbl { font-size: 10px; font-weight: bold; letter-spacing: 2px; text-align: center; margin-bottom: 4px; }
+
+.btn-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.btn {
+  flex: 1; border: none; border-radius: 10px; font-weight: bold; font-size: 14px;
+  padding: 11px 2px; cursor: pointer; transition: transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.95); }
+.b-m { background: rgba(150,50,50,0.45); border: 1px solid rgba(200,80,80,0.45); color: #ff9090; }
+.b-p { background: rgba(50,120,50,0.45); border: 1px solid rgba(80,180,80,0.45); color: #90ff90; }
+
+.inp-row { display: flex; gap: 8px; }
+.inp {
+  flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 10px; color: #ffe; font-size: 16px; text-align: center;
+  padding: 9px; outline: none;
+}
+.btn-set {
+  background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.45);
+  color: #ffd700; border-radius: 10px; padding: 9px 14px; font-weight: bold;
+  cursor: pointer; font-size: 13px; -webkit-tap-highlight-color: transparent;
+}
+.btn-set:active { transform: scale(0.95); }
+
+/* ===== 無演出ボタン ===== */
+.sec-ttl { font-size: 10px; letter-spacing: 2px; margin-bottom: 8px; font-weight: bold; color: #999; }
+.btn-none {
+  width: 100%; border: 2px solid rgba(140,140,140,0.4);
+  border-radius: 12px; padding: 16px; font-size: 18px; font-weight: 900;
+  background: rgba(70,70,70,0.35); color: #bbb; cursor: pointer; letter-spacing: 2px;
+  -webkit-tap-highlight-color: transparent; transition: transform 0.1s;
+}
+.btn-none:active { transform: scale(0.97); }
+.btn-gosen {
+  width: 100%; border: 2px solid rgba(255,200,0,0.5);
+  border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 900;
+  background: rgba(100,80,0,0.35); color: #fde68a; cursor: pointer; letter-spacing: 2px;
+  margin-top: 8px;
+  -webkit-tap-highlight-color: transparent; transition: transform 0.1s;
+}
+.btn-gosen:active { transform: scale(0.97); }
+.btn-tenpa {
+  width: 100%; border: 2px solid rgba(180,80,255,0.5);
+  border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 900;
+  background: rgba(100,0,180,0.3); color: #c084fc; cursor: pointer; letter-spacing: 1px;
+  margin-top: 8px;
+  -webkit-tap-highlight-color: transparent; transition: transform 0.1s;
+  display: block; width: 100%;
+}
+.btn-tenpa:active { transform: scale(0.97); }
+.btn-boss {
+  width: 100%; border: 2px solid rgba(255,120,50,0.5);
+  border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 900;
+  background: rgba(180,60,0,0.3); color: #fb923c; cursor: pointer; letter-spacing: 1px;
+  margin-top: 8px; display: block;
+  -webkit-tap-highlight-color: transparent; transition: transform 0.1s;
+}
+.btn-boss:active { transform: scale(0.97); }
+
+/* ===== レア役 + 演出セレクタ ===== */
+.rare-section { }
+.rare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 8px; }
+.btn-rare {
+  border: none; border-radius: 10px; padding: 13px 6px;
+  font-size: 13px; font-weight: bold; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: transform 0.1s, box-shadow 0.1s;
+  line-height: 1.3;
+}
+.btn-rare:active { transform: scale(0.95); }
+.btn-rare.selected {
+  box-shadow: 0 0 0 2px #ffd700;
+  transform: scale(0.97);
+}
+.br-wcherry { background: rgba(180,30,30,0.4);  border: 1px solid rgba(220,80,80,0.5);  color: #fca5a5; }
+.br-scherry { background: rgba(220,50,50,0.5);  border: 1px solid rgba(255,100,100,0.7); color: #fff; }
+.br-suika   { background: rgba(30,120,30,0.45); border: 1px solid rgba(60,200,60,0.6);  color: #86efac; }
+.br-bell    { background: rgba(160,120,0,0.45); border: 1px solid rgba(220,180,0,0.6);  color: #fde68a; }
+
+/* 演出選択エリア */
+.eff-select-wrap {
+  background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 10px; padding: 10px; margin-top: 4px;
+}
+.eff-select-title { font-size: 10px; color: #c8a84b; letter-spacing: 1px; margin-bottom: 7px; font-weight: bold; }
+.eff-sel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.btn-eff-sel {
+  border-radius: 8px; padding: 9px 5px; font-size: 11px; font-weight: bold;
+  cursor: pointer; line-height: 1.3; transition: transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-eff-sel:active { transform: scale(0.95); }
+.bes-none { background: rgba(60,60,60,0.5);   border: 1px solid rgba(120,120,120,0.4); color: #aaa; }
+.bes-r    { background: rgba(120,20,20,0.55); border: 1px solid rgba(180,50,50,0.55);  color: #fca5a5; }
+.bes-y    { background: rgba(100,80,0,0.5);   border: 1px solid rgba(180,140,0,0.55); color: #fde68a; }
+.bes-b    { background: rgba(20,40,100,0.55); border: 1px solid rgba(50,80,180,0.55); color: #93c5fd; }
+
+/* ===== ゾーン ===== */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.badge { display: inline-block; border-radius: 7px; padding: 2px 10px; font-size: 11px; font-weight: 900; margin-bottom: 7px; }
+.bd-r { background: #b91c1c; color: white; }
+.bd-y { background: #ca8a04; color: black; }
+.bd-b { background: #1d4ed8; color: white; }
+.bd-n { font-size: 10px; color: #777; margin-left: 5px; vertical-align: middle; }
+
+.btn-z {
+  background: rgba(120,50,200,0.38); border: 1px solid rgba(180,100,255,0.45);
+  color: #e0c0ff; border-radius: 10px; padding: 13px 6px; font-weight: bold;
+  font-size: 13px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s;
+}
+.btn-z:active { transform: scale(0.95); }
+
+.btn-e {
+  border-radius: 9px; padding: 9px 5px; font-weight: bold; font-size: 11px;
+  cursor: pointer; line-height: 1.3; transition: transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-e:active { transform: scale(0.95); }
+.be-r { background: rgba(120,20,20,0.55); border: 1px solid rgba(180,50,50,0.5);  color: #fca5a5; }
+.be-y { background: rgba(100,80,0,0.48);  border: 1px solid rgba(180,140,0,0.5); color: #fde68a; }
+.be-b { background: rgba(20,40,100,0.55); border: 1px solid rgba(50,80,180,0.5); color: #93c5fd; }
+
+@keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.35} }
+.btn-stage {
+  border-radius: 8px; padding: 9px 4px; font-size: 11px; font-weight: bold;
+  cursor: pointer; border: 1px solid rgba(150,150,150,0.3);
+  background: rgba(60,60,60,0.3); color: #888;
+  -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+}
+.btn-stage.active {
+  background: rgba(100,200,255,0.2); border-color: rgba(100,200,255,0.7); color: #7dd3fc;
+}
+.btn-z-special {
+  border-color: rgba(255,150,0,0.6) !important;
+  background: rgba(150,80,0,0.4) !important;
+  color: #fbbf24 !important;
+  line-height: 1.3;
+  font-size: 12px !important;
+}
+.btn-z-boss {
+  border-color: rgba(0,200,255,0.7) !important;
+  background: rgba(0,80,150,0.45) !important;
+  color: #7dd3fc !important;
+  line-height: 1.3;
+  font-size: 12px !important;
+}
+.flash { animation: flash 0.18s ease; }
+
+.stage-grid { display: flex; flex-direction: column; gap: 6px; }
+.stage-label {
+  font-size: 9px; font-weight: bold; letter-spacing: 1px;
+  color: #888; padding: 2px 6px; margin-top: 4px;
+  border-left: 2px solid #555;
+  display: block; width: 100%;
+}
+.stage-grid .btn-e { width: 100%; }
+
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: rgba(30,180,80,0.95); color: white;
+  padding: 9px 26px; border-radius: 18px; font-size: 13px; font-weight: bold;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;">
+  <span style="font-size:11px;letter-spacing:3px;color:#c8a84b;font-weight:bold;">北斗転生2 ／ 示唆メモ</span>
+  <button onclick="openSampleEditor()" style="background:rgba(180,100,255,0.2);border:1px solid rgba(180,100,255,0.4);color:#c084fc;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:bold;cursor:pointer;">📊 サンプル</button>
+</header>
+
+<!-- ===== 常時表示ログ ===== -->
+<div class="live-log-wrap">
+  <div class="live-log-header">
+    <span class="live-log-title" id="ll-title">📋 ログ (0)</span>
+    <div class="live-log-btns">
+      <button class="btn-ll-undo" onclick="undoLog()">↩️ やり直し</button>
+      <button class="btn-ll-copy" onclick="copyLine()">📋 LINEコピー</button>
+      <button class="btn-ll-clr"  onclick="clrLog()">クリア</button>
+    </div>
+  </div>
+  <div class="live-log-area" id="live-log-area">
+    <div class="ll-empty">記録なし</div>
+  </div>
+</div>
+
+<!-- ===== 設定変更後 ===== -->
+<div class="tab-panel active" id="pn-s">
+<div class="container">
+
+  <!-- モード選択ボタン -->
+  <div style="display:flex;gap:8px;margin-top:12px;margin-bottom:8px;">
+    <button id="tb-s" onclick="switchTab('s')" style="flex:1;border-radius:12px;padding:14px 6px;font-size:14px;font-weight:900;border:2px solid rgba(249,115,22,0.7);background:rgba(249,115,22,0.25);color:#fb923c;cursor:pointer;letter-spacing:1px;">⚙️ 設定変更後</button>
+    <button id="tb-a-from-s" onclick="switchTab('a')" style="flex:1;border-radius:12px;padding:14px 6px;font-size:14px;font-weight:900;border:2px solid rgba(80,80,80,0.4);background:rgba(50,50,50,0.3);color:#666;cursor:pointer;letter-spacing:1px;">🎯 AT後</button>
+  </div>
+  <!-- ステージ選択 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+    <button class="btn-stage" id="stage-rob-s"   onclick="selectStage('s','ROB BAR')">ROB BAR</button>
+    <button class="btn-stage" id="stage-koya-s"  onclick="selectStage('s','荒野')">荒野</button>
+    <button class="btn-stage" id="stage-kasa-s"  onclick="selectStage('s','カサンドラ')">カサンドラ</button>
+    <button class="btn-stage" id="stage-none-s"  onclick="selectStage('s',null)">指定なし</button>
+  </div>
+
+  <!-- カウンター -->
+  <div class="card c-s">
+    <div class="sec-lbl" style="color:#fb923c">⚙️ 設定変更後</div>
+    <div class="cnt cnt-s" id="cnt-s">0</div>
+    <div class="cnt-lbl">G（現在のゲーム数）</div>
+    <div class="inp-row">
+      <input class="inp" type="number" id="inp-s" placeholder="ゲーム数を入力" inputmode="numeric">
+      <button class="btn-set" onclick="setInp('s')">セット</button>
+      <button class="btn-clr-cnt" onclick="clearCnt('s')">クリア</button>
+    </div>
+  </div>
+
+  <!-- 無演出 -->
+  <div class="card c-gry">
+    <button class="btn-none" onclick="doLog('s','⬜','none','無演出')">⬜ 無演出（次のGへ）</button>
+    <button class="btn-gosen" onclick="doLog('s','⭐','gosen','五車星')">⭐ 五車星（次のGへ）</button>
+    <button class="btn-tenpa" onclick="openTenpa('s')">🌀 天破の刻（G数移動）</button>
+    <div id="tenpa-panel-s" style="display:none;margin-top:8px;background:rgba(100,0,200,0.1);border:1px solid rgba(180,80,255,0.4);border-radius:10px;padding:10px;">
+      <div style="font-size:10px;color:#c084fc;font-weight:bold;margin-bottom:8px;">▼ 移動後のG数を入力</div>
+      <div style="display:flex;gap:8px;">
+        <input id="tenpa-inp-s" type="number" inputmode="numeric" placeholder="移動後のG数" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(180,80,255,0.4);border-radius:10px;color:#ffe;font-size:16px;text-align:center;padding:10px;outline:none;">
+        <button onclick="confirmTenpa('s')" style="background:rgba(180,80,255,0.3);border:1px solid rgba(180,80,255,0.6);color:#e9d5ff;border-radius:10px;padding:10px 14px;font-weight:bold;cursor:pointer;font-size:13px;">移動</button>
+      </div>
+    </div>
+    <button class="btn-boss" onclick="openBoss('s')">⚔️ ボスバトル終了</button>
+    <div id="boss-panel-s" style="display:none;margin-top:8px;background:rgba(180,50,0,0.1);border:1px solid rgba(255,120,50,0.4);border-radius:10px;padding:10px;">
+      <div style="font-size:10px;color:#fb923c;font-weight:bold;margin-bottom:4px;">現在のあべし数でボスバトル終了を記録</div>
+      <div style="font-size:10px;color:#888;margin-bottom:8px;">基準G数を選択してください</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button onclick="confirmBoss('s',123)" style="background:rgba(255,120,50,0.3);border:2px solid rgba(255,120,50,0.7);color:#fdba74;border-radius:10px;padding:14px 6px;font-weight:900;cursor:pointer;font-size:14px;">基準：123G</button>
+        <button onclick="confirmBoss('s',253)" style="background:rgba(255,120,50,0.2);border:1px solid rgba(255,120,50,0.5);color:#fdba74;border-radius:10px;padding:14px 6px;font-weight:900;cursor:pointer;font-size:14px;">基準：253G</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- レア役 -->
+  <div class="card" style="background:rgba(20,80,30,0.2);border:1px solid rgba(50,180,70,0.35)">
+    <div class="sec-ttl" style="color:#4ade80">▶ レア役 ＋ 同時演出を選んで記録</div>
+    <div class="rare-row" id="rare-s">
+      <button class="btn-rare br-wcherry" onclick="selectRare('s','🍒弱チェリー')">🍒 弱チェリー</button>
+      <button class="btn-rare br-scherry" onclick="selectRare('s','🍒強チェリー')">🍒 強チェリー</button>
+      <button class="btn-rare br-suika"   onclick="selectRare('s','🍉スイカ')">🍉 スイカ</button>
+      <button class="btn-rare br-bell"    onclick="selectRare('s','🔔斜めベル')">🔔 斜めベル</button>
+      <button class="btn-rare br-chance"  onclick="selectRare('s','🎯チャンス目')">🎯 チャンス目</button>
+      <button class="btn-rare br-katsu"   onclick="selectRare('s','⚔️勝舞揃い')">⚔️ 勝舞揃い</button>
+    </div>
+    <!-- 演出選択パネル（レア役選択後に表示） -->
+    <div class="eff-select-wrap" id="rare-eff-s" style="display:none">
+      <div class="eff-select-title">▼ 同時演出を選択（なければ「演出なし」）</div>
+      <div class="eff-sel-row">
+        <button class="btn-eff-sel bes-none" onclick="confirmRare('s','なし')">演出なし</button>
+        <button class="btn-eff-sel" style="background:rgba(100,80,0,0.4);border:1px solid rgba(220,180,0,0.5);color:#fde68a;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('s','⭐五車星')">⭐五車星</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('s','共通｜シャッター揺れ')">🔴シャッター揺れ</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('s','共通｜デビルリバース')">🔴デビルリバース</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('s','共通｜牙親父')">🔴牙親父</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('s','共通｜ウイグル足')">🔴ウイグル足</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('s','ROB BAR・荒野｜レイ→バット&リン&マミヤ')">🟠レイ→バット&リン&マミヤ</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('s','ROB BAR｜マント追われ')">🟠マント追われ</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('s','荒野｜モヒカン撃退')">🟠モヒカン撃退</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('s','カサンドラ｜ターバン蹴り')">🟠ターバン蹴り</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','共通｜雑魚武器投げ')">🟡共通｜武器投げ</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','ROB BAR・荒野｜レイ→チョコ')">🟡レイ→チョコ</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','ROB BAR・荒野｜湯浴みレイ')">🟡湯浴みレイ</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','ROB BAR｜デカ雑魚')">🟡ROB BAR｜デカ雑魚</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','ROB BAR｜バット一斗缶')">🟡バット一斗缶</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','荒野｜モヒカン3人')">🟡荒野｜モヒカン3人</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','荒野｜通行人UP')">🟡通行人UP</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','カサンドラ｜展望(マミヤ)')">🟡展望(マミヤ)</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('s','カサンドラ｜展望(レイ&マミヤ)')">🟡展望(レイ&マミヤ)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('s','共通｜1消灯ハズレ')">🔵共通｜1消灯ハズレ</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('s','共通｜第3停止頻発')">🔵第3停止頻発</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('s','ROB BAR｜バット缶')">🔵ROB BAR｜バット缶</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('s','ROB BAR｜第3子供(白)')">🔵ROB BAR｜子供(白)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('s','荒野｜第3親子(白)')">🔵荒野｜親子(白)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('s','カサンドラ｜第3子供(牢屋)')">🔵子供(牢屋)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('s','カサンドラ｜第3兵士(扉)')">🔵兵士(扉)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ゾーン -->
+  <div class="card c-pur">
+    <div class="sec-ttl" style="color:#c084fc">▶ あべしゾーン到達</div>
+    <div class="grid2" id="zones-s"></div>
+  </div>
+
+  <!-- 演出 -->
+  <!-- 強演出：前兆濃厚 -->
+  <div class="card c-red">
+    <div style="margin-bottom:8px">
+      <span class="badge bd-r">🔴強 前兆濃厚</span><span class="bd-n">共通・1回で確定級</span>
+    </div>
+    <div class="grid2" id="es-kakutei-s"></div>
+  </div>
+  <!-- 強演出：期待大 -->
+  <div class="card" style="background:rgba(180,60,0,0.15);border:1px solid rgba(230,100,30,0.45)">
+    <div style="margin-bottom:8px">
+      <span class="badge" style="background:#c2410c;color:white">🟠強 期待大</span><span class="bd-n">ステージ別</span>
+    </div>
+    <div class="grid2" id="es-kitai-s"></div>
+  </div>
+  <div class="card c-yel">
+    <div style="margin-bottom:8px"><span class="badge bd-y">🟡中演出</span><span class="bd-n">ステージ別・レア役後は期待度低下</span></div>
+    <div class="stage-grid" id="em-s"></div>
+  </div>
+  <div class="card c-blu">
+    <div style="margin-bottom:8px"><span class="badge bd-b">🔵弱演出</span><span class="bd-n">ステージ別・頻出で期待度上昇</span></div>
+    <div class="stage-grid" id="ew-s"></div>
+  </div>
+
+  <!-- 100Gランプ -->
+  <div class="card" style="background:rgba(40,40,60,0.3);border:1px solid rgba(200,200,255,0.25)">
+    <div style="margin-bottom:10px">
+      <span class="badge" style="background:rgba(80,80,120,0.8);color:#e0e0ff">💡 100Gランプ</span>
+      <span class="bd-n">記録のみ・G数は進めない</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+      <button class="btn-lamp-abc" id="lamp-btn-A-s" onclick="selectLamp('s','A')" style="background:rgba(180,50,50,0.4);border:2px solid rgba(255,80,80,0.6);color:#fca5a5;">A（スピーカー）</button>
+      <button class="btn-lamp-abc" id="lamp-btn-B-s" onclick="selectLamp('s','B')" style="background:rgba(50,50,180,0.4);border:2px solid rgba(80,80,255,0.6);color:#93c5fd;">B（中央）</button>
+      <button class="btn-lamp-abc" id="lamp-btn-C-s" onclick="selectLamp('s','C')" style="background:rgba(50,150,50,0.4);border:2px solid rgba(80,220,80,0.6);color:#86efac;">C（サブ液晶）</button>
+    </div>
+    <div id="lamp-panel-s" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px;">
+      <div style="font-size:10px;color:#c8a84b;font-weight:bold;margin-bottom:8px" id="lamp-panel-title-s">▼ 点灯パターンを選択</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="lamp-patterns-s"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== AT後 ===== -->
+<div class="tab-panel" id="pn-a">
+<div class="container">
+
+  <!-- モード選択ボタン -->
+  <div style="display:flex;gap:8px;margin-top:12px;margin-bottom:8px;">
+    <button id="tb-s-from-a" onclick="switchTab('s')" style="flex:1;border-radius:12px;padding:14px 6px;font-size:14px;font-weight:900;border:2px solid rgba(80,80,80,0.4);background:rgba(50,50,50,0.3);color:#666;cursor:pointer;letter-spacing:1px;">⚙️ 設定変更後</button>
+    <button id="tb-a" onclick="switchTab('a')" style="flex:1;border-radius:12px;padding:14px 6px;font-size:14px;font-weight:900;border:2px solid rgba(34,211,238,0.7);background:rgba(34,211,238,0.15);color:#22d3ee;cursor:pointer;letter-spacing:1px;">🎯 AT後</button>
+  </div>
+  <!-- ステージ選択 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+    <button class="btn-stage" id="stage-rob-a"   onclick="selectStage('a','ROB BAR')">ROB BAR</button>
+    <button class="btn-stage" id="stage-koya-a"  onclick="selectStage('a','荒野')">荒野</button>
+    <button class="btn-stage" id="stage-kasa-a"  onclick="selectStage('a','カサンドラ')">カサンドラ</button>
+    <button class="btn-stage" id="stage-none-a"  onclick="selectStage('a',null)">指定なし</button>
+  </div>
+
+  <div class="card c-a">
+    <div class="sec-lbl" style="color:#22d3ee">🎯 AT後</div>
+    <div class="cnt cnt-a" id="cnt-a">0</div>
+    <div class="cnt-lbl">G（現在のゲーム数）</div>
+    <div class="inp-row">
+      <input class="inp" type="number" id="inp-a" placeholder="ゲーム数を入力" inputmode="numeric">
+      <button class="btn-set" onclick="setInp('a')">セット</button>
+      <button class="btn-clr-cnt" onclick="clearCnt('a')">クリア</button>
+    </div>
+  </div>
+
+  <div class="card c-gry">
+    <button class="btn-none" onclick="doLog('a','⬜','none','無演出')">⬜ 無演出（次のGへ）</button>
+    <button class="btn-gosen" onclick="doLog('a','⭐','gosen','五車星')">⭐ 五車星（次のGへ）</button>
+    <button class="btn-tenpa" onclick="openTenpa('a')">🌀 天破の刻（G数移動）</button>
+    <div id="tenpa-panel-a" style="display:none;margin-top:8px;background:rgba(100,0,200,0.1);border:1px solid rgba(180,80,255,0.4);border-radius:10px;padding:10px;">
+      <div style="font-size:10px;color:#c084fc;font-weight:bold;margin-bottom:8px;">▼ 移動後のG数を入力</div>
+      <div style="display:flex;gap:8px;">
+        <input id="tenpa-inp-a" type="number" inputmode="numeric" placeholder="移動後のG数" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(180,80,255,0.4);border-radius:10px;color:#ffe;font-size:16px;text-align:center;padding:10px;outline:none;">
+        <button onclick="confirmTenpa('a')" style="background:rgba(180,80,255,0.3);border:1px solid rgba(180,80,255,0.6);color:#e9d5ff;border-radius:10px;padding:10px 14px;font-weight:bold;cursor:pointer;font-size:13px;">移動</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card" style="background:rgba(20,80,30,0.2);border:1px solid rgba(50,180,70,0.35)">
+    <div class="sec-ttl" style="color:#4ade80">▶ レア役 ＋ 同時演出を選んで記録</div>
+    <div class="rare-row" id="rare-a">
+      <button class="btn-rare br-wcherry" onclick="selectRare('a','🍒弱チェリー')">🍒 弱チェリー</button>
+      <button class="btn-rare br-scherry" onclick="selectRare('a','🍒強チェリー')">🍒 強チェリー</button>
+      <button class="btn-rare br-suika"   onclick="selectRare('a','🍉スイカ')">🍉 スイカ</button>
+      <button class="btn-rare br-bell"    onclick="selectRare('a','🔔斜めベル')">🔔 斜めベル</button>
+      <button class="btn-rare br-chance"  onclick="selectRare('a','🎯チャンス目')">🎯 チャンス目</button>
+      <button class="btn-rare br-katsu"   onclick="selectRare('a','⚔️勝舞揃い')">⚔️ 勝舞揃い</button>
+    </div>
+    <div class="eff-select-wrap" id="rare-eff-a" style="display:none">
+      <div class="eff-select-title">▼ 同時演出を選択（なければ「演出なし」）</div>
+      <div class="eff-sel-row">
+        <button class="btn-eff-sel bes-none" onclick="confirmRare('a','なし')">演出なし</button>
+        <button class="btn-eff-sel" style="background:rgba(100,80,0,0.4);border:1px solid rgba(220,180,0,0.5);color:#fde68a;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('a','⭐五車星')">⭐五車星</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('a','共通｜シャッター揺れ')">🔴シャッター揺れ</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('a','共通｜デビルリバース')">🔴デビルリバース</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('a','共通｜牙親父')">🔴牙親父</button>
+        <button class="btn-eff-sel bes-r" onclick="confirmRare('a','共通｜ウイグル足')">🔴ウイグル足</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('a','ROB BAR・荒野｜レイ→バット&リン&マミヤ')">🟠レイ→バット&リン&マミヤ</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('a','ROB BAR｜マント追われ')">🟠マント追われ</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('a','荒野｜モヒカン撃退')">🟠モヒカン撃退</button>
+        <button class="btn-eff-sel" style="background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;border-radius:8px;padding:5px 4px;font-size:11px;font-weight:bold;cursor:pointer;" onclick="confirmRare('a','カサンドラ｜ターバン蹴り')">🟠ターバン蹴り</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','共通｜雑魚武器投げ')">🟡共通｜武器投げ</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','ROB BAR・荒野｜レイ→チョコ')">🟡レイ→チョコ</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','ROB BAR・荒野｜湯浴みレイ')">🟡湯浴みレイ</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','ROB BAR｜デカ雑魚')">🟡ROB BAR｜デカ雑魚</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','ROB BAR｜バット一斗缶')">🟡バット一斗缶</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','荒野｜モヒカン3人')">🟡荒野｜モヒカン3人</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','荒野｜通行人UP')">🟡通行人UP</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','カサンドラ｜展望(マミヤ)')">🟡展望(マミヤ)</button>
+        <button class="btn-eff-sel bes-y" onclick="confirmRare('a','カサンドラ｜展望(レイ&マミヤ)')">🟡展望(レイ&マミヤ)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('a','共通｜1消灯ハズレ')">🔵共通｜1消灯ハズレ</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('a','共通｜第3停止頻発')">🔵第3停止頻発</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('a','ROB BAR｜バット缶')">🔵ROB BAR｜バット缶</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('a','ROB BAR｜第3子供(白)')">🔵ROB BAR｜子供(白)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('a','荒野｜第3親子(白)')">🔵荒野｜親子(白)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('a','カサンドラ｜第3子供(牢屋)')">🔵子供(牢屋)</button>
+        <button class="btn-eff-sel bes-b" onclick="confirmRare('a','カサンドラ｜第3兵士(扉)')">🔵兵士(扉)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card c-pur">
+    <div class="sec-ttl" style="color:#c084fc">▶ あべしゾーン到達</div>
+    <div class="grid2" id="zones-a"></div>
+  </div>
+
+  <!-- 強演出：前兆濃厚 -->
+  <div class="card c-red">
+    <div style="margin-bottom:8px">
+      <span class="badge bd-r">🔴強 前兆濃厚</span><span class="bd-n">共通・1回で確定級</span>
+    </div>
+    <div class="grid2" id="es-kakutei-a"></div>
+  </div>
+  <!-- 強演出：期待大 -->
+  <div class="card" style="background:rgba(180,60,0,0.15);border:1px solid rgba(230,100,30,0.45)">
+    <div style="margin-bottom:8px">
+      <span class="badge" style="background:#c2410c;color:white">🟠強 期待大</span><span class="bd-n">ステージ別</span>
+    </div>
+    <div class="grid2" id="es-kitai-a"></div>
+  </div>
+  <div class="card c-yel">
+    <div style="margin-bottom:8px"><span class="badge bd-y">🟡中演出</span><span class="bd-n">ステージ別・レア役後は期待度低下</span></div>
+    <div class="stage-grid" id="em-a"></div>
+  </div>
+  <div class="card c-blu">
+    <div style="margin-bottom:8px"><span class="badge bd-b">🔵弱演出</span><span class="bd-n">ステージ別・頻出で期待度上昇</span></div>
+    <div class="stage-grid" id="ew-a"></div>
+  </div>
+
+  <!-- 100Gランプ -->
+  <div class="card" style="background:rgba(40,40,60,0.3);border:1px solid rgba(200,200,255,0.25)">
+    <div style="margin-bottom:10px">
+      <span class="badge" style="background:rgba(80,80,120,0.8);color:#e0e0ff">💡 100Gランプ</span>
+      <span class="bd-n">記録のみ・G数は進めない</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+      <button class="btn-lamp-abc" id="lamp-btn-A-a" onclick="selectLamp('a','A')" style="background:rgba(180,50,50,0.4);border:2px solid rgba(255,80,80,0.6);color:#fca5a5;">A（スピーカー）</button>
+      <button class="btn-lamp-abc" id="lamp-btn-B-a" onclick="selectLamp('a','B')" style="background:rgba(50,50,180,0.4);border:2px solid rgba(80,80,255,0.6);color:#93c5fd;">B（中央）</button>
+      <button class="btn-lamp-abc" id="lamp-btn-C-a" onclick="selectLamp('a','C')" style="background:rgba(50,150,50,0.4);border:2px solid rgba(80,220,80,0.6);color:#86efac;">C（サブ液晶）</button>
+    </div>
+    <div id="lamp-panel-a" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px;">
+      <div style="font-size:10px;color:#c8a84b;font-weight:bold;margin-bottom:8px" id="lamp-panel-title-a">▼ 点灯パターンを選択</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="lamp-patterns-a"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- サンプル編集モーダル -->
+<div id="sample-editor" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:100;overflow-y:auto;">
+  <div style="background:#0f0f1a;border:1px solid rgba(255,200,0,0.4);border-radius:16px;margin:40px auto;max-width:440px;padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:14px;font-weight:bold;color:#ffd700;">📊 サンプルデータ編集</span>
+      <button onclick="closeSampleEditor()" style="background:rgba(200,80,80,0.3);border:1px solid rgba(200,80,80,0.5);color:#ff9090;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px;">閉じる</button>
+    </div>
+    <p style="font-size:10px;color:#888;margin-bottom:14px;">サンプル数が増えたら数値を更新してください。</p>
+    <!-- 608〜624 -->
+    <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:bold;color:#c084fc;margin-bottom:10px;">📍 608〜624</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div style="font-size:10px;color:#fca5a5;margin-bottom:4px;">🔴 シャッターあり</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
+            当選 <input id="se-608-624-ari-win" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
+            / <input id="se-608-624-ari-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#ccc;margin-bottom:4px;">⬜ シャッターなし</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
+            超え <input id="se-608-624-nashi-lose" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
+            / <input id="se-608-624-nashi-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 672〜688 -->
+    <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:bold;color:#c084fc;margin-bottom:10px;">📍 672〜688</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div style="font-size:10px;color:#fca5a5;margin-bottom:4px;">🔴 シャッターあり</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
+            当選 <input id="se-672-688-ari-win" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
+            / <input id="se-672-688-ari-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#ccc;margin-bottom:4px;">⬜ シャッターなし</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
+            超え <input id="se-672-688-nashi-lose" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
+            / <input id="se-672-688-nashi-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
+          </div>
+        </div>
+      </div>
+    </div>
+    <button onclick="saveSampleData()" style="width:100%;background:rgba(0,200,80,0.3);border:1px solid rgba(0,200,80,0.6);color:#4ade80;border-radius:10px;padding:12px;font-size:14px;font-weight:bold;cursor:pointer;">💾 保存する</button>
+  </div>
+</div>
+
+<script>
+const ZONES  = ['32〜48','160〜176','288〜304','352〜368','416〜432','480〜496','608〜624','672〜688'];
+
+// 強演出：前兆濃厚（共通）
+const STRONG_KAKUTEI = [
+  '共通｜シャッター揺れ',
+  '共通｜デビルリバース',
+  '共通｜牙親父',
+  '共通｜ウイグル足',
+];
+
+// 強演出：期待大（ステージ別）
+const STRONG_KITAI = [
+  'ROB BAR・荒野｜レイ→バット&リン&マミヤ',
+  'ROB BAR｜マント追われ',
+  '荒野｜モヒカン撃退',
+  'カサンドラ｜ターバン蹴り',
+];
+
+// 中演出（ステージ別）
+const MID_GROUPS = [
+  { stage:'共通',         items:['共通｜雑魚武器投げ'] },
+  { stage:'ROB BAR・荒野', items:['ROB BAR・荒野｜レイ→チョコ','ROB BAR・荒野｜湯浴みレイ'] },
+  { stage:'ROB BAR',     items:['ROB BAR｜デカ雑魚','ROB BAR｜バット一斗缶'] },
+  { stage:'荒野',         items:['荒野｜モヒカン3人','荒野｜通行人UP'] },
+  { stage:'カサンドラ',   items:['カサンドラ｜展望(マミヤ)','カサンドラ｜展望(レイ&マミヤ)'] },
+];
+// 弱演出（ステージ別）
+const WEAK_GROUPS = [
+  { stage:'共通',       items:['共通｜1消灯ハズレ','共通｜第3停止頻発'] },
+  { stage:'ROB BAR',   items:['ROB BAR｜バット缶','ROB BAR｜第3子供(白)'] },
+  { stage:'荒野',       items:['荒野｜第3親子(白)'] },
+  { stage:'カサンドラ', items:['カサンドラ｜第3子供(牢屋)','カサンドラ｜第3兵士(扉)'] },
+];
+
+// ===== サンプルデータ（608〜624 / 672〜688）=====
+let sampleData = {
+  '608〜624': { あり: { win:8, total:9 }, なし: { lose:4, total:4 } },
+  '672〜688': { あり: { win:0, total:0 }, なし: { lose:0, total:0 } },
+};
+
+// 特殊ゾーン（シャッターあり/なし選択）
+const SHUTTER_ZONES = ['608〜624','672〜688'];
+const BOSS_ZONES = ['352〜368']; // ボスバトル発展で期待度50%
+const selectedZone = { s: null, a: null };
+
+const counts   = { s: 0, a: 0 };
+const logs     = [];
+const selected = { s: null, a: null };
+const currentStage = { s: null, a: null };
+
+// ===== localStorage 保存・復元 =====
+function saveState() {
+  try {
+    localStorage.setItem('hokuto_counts', JSON.stringify(counts));
+    localStorage.setItem('hokuto_logs',   JSON.stringify(logs));
+    localStorage.setItem('hokuto_sample', JSON.stringify(sampleData));
+    localStorage.setItem('hokuto_stage',  JSON.stringify(currentStage));
+  } catch(e) {}
+}
+function loadState() {
+  try {
+    const c = localStorage.getItem('hokuto_counts');
+    const l = localStorage.getItem('hokuto_logs');
+    const s = localStorage.getItem('hokuto_sample');
+    const st = localStorage.getItem('hokuto_stage');
+    if (c) { const d=JSON.parse(c); counts.s=d.s||0; counts.a=d.a||0; }
+    if (l) { const d=JSON.parse(l); logs.push(...d); }
+    if (s) { const d=JSON.parse(s); Object.assign(sampleData, d); }
+    if (st) { const d=JSON.parse(st); currentStage.s=d.s||null; currentStage.a=d.a||null; }
+  } catch(e) {}
+}
+
+// ===== ボタン生成 =====
+['s','a'].forEach(m => {
+  document.getElementById(`zones-${m}`).innerHTML =
+    ZONES.map(z => {
+      if (SHUTTER_ZONES.includes(z)) {
+        return `<button class="btn-z btn-z-special" onclick="selectZoneShutter('${m}','${z}')">${z}<br><span style="font-size:9px;opacity:0.7">シャッターあり/なし</span></button>`;
+      }
+      if (BOSS_ZONES.includes(z)) {
+        return `<button class="btn-z btn-z-boss" onclick="logZone('${m}','${z}')">${z}<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>`;
+      }
+      return `<button class="btn-z" onclick="logZone('${m}','${z}')">${z}</button>`;
+    }).join('');
+  document.getElementById(`es-kakutei-${m}`).innerHTML =
+    STRONG_KAKUTEI.map(n => `<button class="btn-e be-r" onclick="doLog('${m}','🔴','strong','${n}')">${n}</button>`).join('');
+  document.getElementById(`es-kitai-${m}`).innerHTML =
+    STRONG_KITAI.map(n => `<button class="btn-e" style="border-radius:9px;padding:9px 5px;font-weight:bold;font-size:11px;cursor:pointer;line-height:1.3;background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;" onclick="doLog('${m}','🟠','kitai','${n}')">${n}</button>`).join('');
+  // 中演出：ステージグループ別に生成
+  document.getElementById(`em-${m}`).innerHTML =
+    MID_GROUPS.map(g =>
+      `<div class="stage-label">${g.stage}</div>` +
+      g.items.map(n => `<button class="btn-e be-y" onclick="doLog('${m}','🟡','mid','${n}')">${n.split('｜')[1]}</button>`).join('')
+    ).join('');
+  // 弱演出：ステージグループ別に生成
+  document.getElementById(`ew-${m}`).innerHTML =
+    WEAK_GROUPS.map(g =>
+      `<div class="stage-label">${g.stage}</div>` +
+      g.items.map(n => `<button class="btn-e be-b" onclick="doLog('${m}','🔵','weak','${n}')">${n.split('｜')[1]}</button>`).join('')
+    ).join('');
+  document.getElementById(`inp-${m}`).addEventListener('keydown', e => { if(e.key==='Enter') setInp(m); });
+});
+
+
+
+// ===== ステージ選択 =====
+const STAGE_MAP = {
+  'ROB BAR':   ['共通', 'ROB BAR', 'ROB BAR・荒野'],
+  '荒野':      ['共通', '荒野', 'ROB BAR・荒野'],
+  'カサンドラ':['共通', 'カサンドラ'],
+  null:        null, // 全表示
+};
+
+function selectStage(m, stage) {
+  currentStage[m] = stage;
+  // ボタンのハイライト更新
+  updateStageButtons(m);
+  // 演出ボタン再生成
+  renderEffByStage(m);
+  saveState();
+}
+
+function updateStageButtons(m) {
+  const stage = currentStage[m];
+  const map = { 'ROB BAR':'rob', '荒野':'koya', 'カサンドラ':'kasa', null:'none' };
+  ['rob','koya','kasa','none'].forEach(k => {
+    const btn = document.getElementById(`stage-${k}-${m}`);
+    if (btn) btn.classList.toggle('active', map[stage]===k);
+  });
+}
+
+function renderEffByStage(m) {
+  const stage = currentStage[m];
+  const allowed = STAGE_MAP[stage]; // nullなら全表示
+
+  // 強演出：期待大（ステージ別）
+  document.getElementById(`es-kitai-${m}`).innerHTML =
+    STRONG_KITAI.filter(n => !allowed || allowed.some(s => n.startsWith(s+'｜') || n.startsWith(s+'・')))
+    .map(n => `<button class="btn-e" style="border-radius:9px;padding:9px 5px;font-weight:bold;font-size:11px;cursor:pointer;line-height:1.3;background:rgba(180,60,0,0.5);border:1px solid rgba(230,100,30,0.6);color:#fdba74;" onclick="doLog('${m}','🟠','kitai','${n}')">${n}</button>`).join('');
+
+  // 中演出
+  document.getElementById(`em-${m}`).innerHTML =
+    MID_GROUPS
+      .filter(g => !allowed || allowed.includes(g.stage) || g.stage === '共通')
+      .map(g =>
+        `<div class="stage-label">${g.stage}</div>` +
+        g.items.map(n => `<button class="btn-e be-y" onclick="doLog('${m}','🟡','mid','${n}')">${n.split('｜')[1]}</button>`).join('')
+      ).join('');
+
+  // 弱演出
+  document.getElementById(`ew-${m}`).innerHTML =
+    WEAK_GROUPS
+      .filter(g => !allowed || allowed.includes(g.stage) || g.stage === '共通')
+      .map(g =>
+        `<div class="stage-label">${g.stage}</div>` +
+        g.items.map(n => `<button class="btn-e be-b" onclick="doLog('${m}','🔵','weak','${n}')">${n.split('｜')[1]}</button>`).join('')
+      ).join('');
+}
+
+// ===== 起動時に復元 =====
+loadState();
+['s','a'].forEach(m => {
+  updateCnt(m);
+  updateStageButtons(m);
+  renderEffByStage(m);
+});
+renderLiveLog();
+
+// ===== タブ切替 =====
+function switchTab(t) {
+  // パネル切替
+  ['s','a'].forEach(m => {
+    document.getElementById(`pn-${m}`).classList.toggle('active', m===t);
+  });
+  // 設定変更後パネル内ボタン
+  const btnS = document.getElementById('tb-s');
+  const btnAFromS = document.getElementById('tb-a-from-s');
+  if (btnS) {
+    btnS.style.borderColor = t==='s' ? 'rgba(249,115,22,0.7)' : 'rgba(80,80,80,0.4)';
+    btnS.style.background  = t==='s' ? 'rgba(249,115,22,0.25)' : 'rgba(50,50,50,0.3)';
+    btnS.style.color       = t==='s' ? '#fb923c' : '#666';
+  }
+  if (btnAFromS) {
+    btnAFromS.style.borderColor = t==='a' ? 'rgba(34,211,238,0.7)' : 'rgba(80,80,80,0.4)';
+    btnAFromS.style.background  = t==='a' ? 'rgba(34,211,238,0.15)' : 'rgba(50,50,50,0.3)';
+    btnAFromS.style.color       = t==='a' ? '#22d3ee' : '#666';
+  }
+  // AT後パネル内ボタン
+  const btnSFromA = document.getElementById('tb-s-from-a');
+  const btnA = document.getElementById('tb-a');
+  if (btnSFromA) {
+    btnSFromA.style.borderColor = t==='s' ? 'rgba(249,115,22,0.7)' : 'rgba(80,80,80,0.4)';
+    btnSFromA.style.background  = t==='s' ? 'rgba(249,115,22,0.25)' : 'rgba(50,50,50,0.3)';
+    btnSFromA.style.color       = t==='s' ? '#fb923c' : '#666';
+  }
+  if (btnA) {
+    btnA.style.borderColor = t==='a' ? 'rgba(34,211,238,0.7)' : 'rgba(80,80,80,0.4)';
+    btnA.style.background  = t==='a' ? 'rgba(34,211,238,0.15)' : 'rgba(50,50,50,0.3)';
+    btnA.style.color       = t==='a' ? '#22d3ee' : '#666';
+  }
+}
+
+// ===== カウンター =====
+function adj(m, d) { counts[m] = Math.max(0, counts[m]+d); updateCnt(m); }
+function setInp(m) {
+  const el = document.getElementById(`inp-${m}`);
+  const n = parseInt(el.value, 10);
+  if (!isNaN(n) && n >= 0) { counts[m] = n; updateCnt(m); }
+  el.value = '';
+}
+function clearCnt(m) {
+  counts[m] = 0;
+  updateCnt(m);
+  showToast('ゲーム数をリセットしました');
+}
+function updateCnt(m) {
+  const el = document.getElementById(`cnt-${m}`);
+  el.textContent = counts[m];
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  saveState();
+}
+
+// ===== メインログ処理（+1G自動進行） =====
+function doLog(m, icon, type, name) {
+  const g = counts[m];
+  const mLabel = m === 's' ? '⚙️' : '🎯';
+  let txt, cls;
+  let lineText; // LINEコピー用のシンプルテキスト
+  if (type === 'none') {
+    txt = `${mLabel}[${g}G] ⬜ 無演出`; cls = 'll-none';
+    lineText = `${g}`;
+  } else if (type === 'gosen') {
+    txt = `${mLabel}[${g}G] ⭐ 五車星`; cls = 'll-gosen';
+    lineText = `${g} ⭐五車星`;
+  } else if (type === 'rare') {
+    txt = `${mLabel}[${g}G] 🟢 ${name}`; cls = 'll-rare';
+    lineText = `${g} 🟢 ${name}`;
+  } else if (type === 'rare+eff') {
+    txt = `${mLabel}[${g}G] 🟢 ${icon} ${name}`; cls = 'll-rare';
+    lineText = `${g} 🟢 ${icon} ${name}`;
+  } else {
+    const tmap = { strong:'🔴強', kitai:'🟠強', mid:'🟡中', weak:'🔵弱' };
+    txt = `${mLabel}[${g}G] ${tmap[type]} ${name}`; cls = 'll-new';
+    lineText = `${g} ${tmap[type]} ${name}`;
+  }
+  logs.unshift({ txt, cls, g, m, lineText });
+  counts[m] = g + 1;
+  updateCnt(m);
+  renderLiveLog();
+}
+
+function logZone(m, label) {
+  const mLabel = m === 's' ? '⚙️' : '🎯';
+  const g = counts[m];
+  let note = BOSS_ZONES.includes(label) ? '（ボスBT発展で期待度50%）' : '';
+  logs.unshift({ txt: `${mLabel}[${g}G] 📍ゾーン[${label}]到達${note}`, cls: 'll-new', g, m, lineText: `${g} 📍ゾーン[${label}]到達${note}` });
+  renderLiveLog();
+}
+
+function selectZoneShutter(m, zone) {
+  selectedZone[m] = zone;
+  // パネル表示
+  const panel = document.getElementById(`shutter-panel-${m}`);
+  const title = document.getElementById(`shutter-title-${m}`);
+  if (!panel) return;
+  const sd = sampleData[zone];
+  const ariTxt  = sd.あり.total > 0 ? `${sd.あり.win}/${sd.あり.total}` : 'データなし';
+  const nashiTxt = sd.なし.total > 0 ? `${sd.なし.lose}/${sd.なし.total}超え` : 'データなし';
+  title.textContent = `▼ ${zone}：シャッターを選択`;
+  document.getElementById(`shutter-ari-stat-${m}`).textContent  = `サンプル: ${ariTxt}`;
+  document.getElementById(`shutter-nashi-stat-${m}`).textContent = `サンプル: ${nashiTxt}`;
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function confirmShutter(m, type) {
+  const zone = selectedZone[m]; if (!zone) return;
+  const mLabel = m === 's' ? '⚙️' : '🎯';
+  const g = counts[m];
+  const sd = sampleData[zone];
+  let txt, lineText;
+  if (type === 'あり') {
+    const stat = sd.あり.total > 0 ? ` (${sd.あり.win}/${sd.あり.total}当選)` : '';
+    txt = `${mLabel}[${g}G] 📍${zone} 🔴シャッターあり${stat}（896以内ほぼ確定）`;
+    lineText = `${g} 📍${zone} 🔴シャッターあり${stat}`;
+  } else {
+    const stat = sd.なし.total > 0 ? ` (${sd.なし.lose}/${sd.なし.total}超え)` : '';
+    txt = `${mLabel}[${g}G] 📍${zone} ⬜シャッターなし${stat}（896抜け高確率）`;
+    lineText = `${g} 📍${zone} ⬜シャッターなし${stat}`;
+  }
+  logs.unshift({ txt, cls: 'll-new', g, m, lineText });
+  renderLiveLog();
+  document.getElementById(`shutter-panel-${m}`).style.display = 'none';
+  selectedZone[m] = null;
+}
+
+// ===== サンプル編集 =====
+function openSampleEditor() {
+  document.getElementById('sample-editor').style.display = 'block';
+  updateSampleEditor();
+}
+function closeSampleEditor() {
+  document.getElementById('sample-editor').style.display = 'none';
+}
+function updateSampleEditor() {
+  ['608〜624','672〜688'].forEach(zone => {
+    const sd = sampleData[zone];
+    const key = zone.replace('〜','-');
+    document.getElementById(`se-${key}-ari-win`).value   = sd.あり.win;
+    document.getElementById(`se-${key}-ari-tot`).value   = sd.あり.total;
+    document.getElementById(`se-${key}-nashi-lose`).value = sd.なし.lose;
+    document.getElementById(`se-${key}-nashi-tot`).value  = sd.なし.total;
+  });
+}
+function saveSampleData() {
+  ['608〜624','672〜688'].forEach(zone => {
+    const key = zone.replace('〜','-');
+    sampleData[zone].あり.win    = parseInt(document.getElementById(`se-${key}-ari-win`).value)||0;
+    sampleData[zone].あり.total  = parseInt(document.getElementById(`se-${key}-ari-tot`).value)||0;
+    sampleData[zone].なし.lose   = parseInt(document.getElementById(`se-${key}-nashi-lose`).value)||0;
+    sampleData[zone].なし.total  = parseInt(document.getElementById(`se-${key}-nashi-tot`).value)||0;
+  });
+  closeSampleEditor();
+  showToast('サンプルデータを更新しました！');
+}
+
+// ===== レア役選択フロー =====
+function selectRare(m, rareName) {
+  selected[m] = rareName;
+  // ボタンのハイライト
+  document.querySelectorAll(`#rare-${m} .btn-rare`).forEach(b => b.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  // 演出選択パネルを表示
+  document.getElementById(`rare-eff-${m}`).style.display = 'block';
+  // スクロールして見えるように
+  document.getElementById(`rare-eff-${m}`).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function confirmRare(m, effName) {
+  const rare = selected[m];
+  if (!rare) return;
+  if (effName === 'なし') {
+    doLog(m, '', 'rare', rare);
+  } else {
+    doLog(m, effName, 'rare+eff', `${rare} ＋ ${effName}`);
+  }
+  // リセット
+  selected[m] = null;
+  document.querySelectorAll(`#rare-${m} .btn-rare`).forEach(b => b.classList.remove('selected'));
+  document.getElementById(`rare-eff-${m}`).style.display = 'none';
+}
+
+// ===== ライブログ描画 =====
+function renderLiveLog() {
+  saveState();
+  const area = document.getElementById('live-log-area');
+  document.getElementById('ll-title').textContent = `📋 ログ (${logs.length})`;
+  if (!logs.length) { area.innerHTML = '<div class="ll-empty">記録なし</div>'; return; }
+  area.innerHTML = logs.map((e, i) =>
+    `<div class="ll-item ${i===0 ? e.cls : 'll-old'}">${e.txt}</div>`
+  ).join('');
+}
+
+// ===== LINEコピー =====
+function copyLine() {
+  if (!logs.length) { showToast('記録がありません'); return; }
+  const sLogs = [...logs].reverse().filter(e => e.m==='s');
+  const aLogs = [...logs].reverse().filter(e => e.m==='a');
+  let parts = [];
+  if (sLogs.length) {
+    parts.push('⚙️設定変更後');
+    parts.push(...sLogs.map(e => e.lineText));
+  }
+  if (aLogs.length) {
+    if (parts.length) parts.push('');
+    parts.push('🎯AT後');
+    parts.push(...aLogs.map(e => e.lineText));
+  }
+  const txt = parts.join('\n');
+  // textareaを使ったフォールバックコピー
+  const ta = document.createElement("textarea");
+  ta.value = txt;
+  ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0;";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand("copy");
+    showToast('LINEにコピーしました！');
+  } catch(e) {
+    showToast('コピー失敗。手動でコピーしてください');
+  }
+  document.body.removeChild(ta);
+}
+
+function undoLog() {
+  if (!logs.length) { showToast('戻るログがありません'); return; }
+  const last = logs[0];
+  logs.shift();
+  // G数を1戻す
+  counts[last.m] = Math.max(0, counts[last.m] - 1);
+  updateCnt(last.m);
+  renderLiveLog();
+  showToast(`[${last.g}G]を削除して${counts[last.m]}Gに戻しました`);
+}
+
+function clrLog() {
+  if (logs.length) {
+    logs.length = 0;
+    renderLiveLog();
+    // ゾーンボタンを元に戻す
+    ['s','a'].forEach(function(tab) {
+      var el = document.getElementById('zones-' + tab);
+      if (!el) return;
+      el.innerHTML = ZONES_ALL.map(function(z) {
+        if (SHUTTER_ZONES.includes(z)) {
+          return '<button class="btn-z btn-z-special" onclick="selectZoneShutter(\'' + tab + '\',\'' + z + '\')">'
+              + z + '<br><span style="font-size:9px;opacity:0.7">シャッターあり/なし</span></button>';
+        }
+        if (BOSS_ZONES.includes(z)) {
+          return '<button class="btn-z btn-z-boss" onclick="logZone(\'' + tab + '\',\'' + z + '\')">' + z + '<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>';
+        }
+        return '<button class="btn-z" onclick="logZone(\'' + tab + '\',\'' + z + '\')">' + z + '</button>';
+      }).join('');
+    });
+    showToast('ログをクリアしました');
+  }
+}
+
+// ===== 100Gランプ =====
+const LAMP_PATTERNS = {
+  A: [
+    { label:'白',          icon:'⚪', hint:'1280G以内期待(弱)',  bg:'rgba(200,200,200,0.2)', border:'rgba(255,255,255,0.6)', color:'#fff' },
+    { label:'白点滅',      icon:'⚪✨', hint:'1280G以内期待(強)', bg:'rgba(200,200,200,0.25)',border:'rgba(255,255,255,0.8)', color:'#fff' },
+    { label:'水色',        icon:'🔵', hint:'896G以内期待(弱)',   bg:'rgba(30,100,180,0.3)',  border:'rgba(100,180,255,0.6)',color:'#bae6fd' },
+    { label:'水色点滅',    icon:'🔵✨', hint:'576G以内期待(弱)', bg:'rgba(30,100,180,0.35)', border:'rgba(100,180,255,0.8)',color:'#bae6fd' },
+    { label:'水色+白流れ', icon:'🔵⬆️', hint:'896G以内期待(強)', bg:'rgba(30,100,180,0.35)', border:'rgba(150,220,255,0.7)',color:'#e0f2fe' },
+    { label:'水色点滅+白流れ',icon:'🔵✨⬆️',hint:'576G以内期待(強)',bg:'rgba(30,100,180,0.4)',border:'rgba(150,220,255,0.9)',color:'#e0f2fe' },
+    { label:'黄緑',        icon:'🟡', hint:'モードB以上濃厚',    bg:'rgba(80,140,0,0.3)',    border:'rgba(160,240,0,0.7)', color:'#d9f99d' },
+    { label:'黄緑点滅',    icon:'🟡✨', hint:'モードC以上濃厚',  bg:'rgba(80,140,0,0.35)',   border:'rgba(160,240,0,0.9)', color:'#d9f99d' },
+    { label:'金',          icon:'🟠', hint:'モードB以上(設4以上)',bg:'rgba(160,100,0,0.3)',  border:'rgba(255,180,0,0.7)', color:'#fde68a' },
+    { label:'金点滅',      icon:'🟠✨', hint:'モードC以上(設4以上)',bg:'rgba(160,100,0,0.35)',border:'rgba(255,180,0,0.9)', color:'#fde68a' },
+    { label:'紫',          icon:'🟣', hint:'モードB以上(設6濃厚)',bg:'rgba(100,0,160,0.3)',  border:'rgba(200,80,255,0.7)',color:'#e9d5ff' },
+    { label:'紫点滅',      icon:'🟣✨', hint:'モードC以上(設6濃厚)',bg:'rgba(100,0,160,0.35)',border:'rgba(200,80,255,0.9)',color:'#e9d5ff' },
+  ],
+  B: [
+    { label:'白',       icon:'⚪', hint:'設定2・4期待UP',   bg:'rgba(200,200,200,0.2)', border:'rgba(255,255,255,0.6)', color:'#fff' },
+    { label:'白点滅',   icon:'⚪✨', hint:'設定3・5期待UP',  bg:'rgba(200,200,200,0.25)',border:'rgba(255,255,255,0.8)', color:'#fff' },
+    { label:'水色',     icon:'🔵', hint:'高設定期待UP(弱)',  bg:'rgba(30,100,180,0.3)',  border:'rgba(100,180,255,0.6)',color:'#bae6fd' },
+    { label:'水色点滅', icon:'🔵✨', hint:'高設定期待UP(強)', bg:'rgba(30,100,180,0.35)', border:'rgba(100,180,255,0.8)',color:'#bae6fd' },
+    { label:'黄緑',     icon:'🟡', hint:'設定2以上濃厚',    bg:'rgba(80,140,0,0.3)',    border:'rgba(160,240,0,0.7)', color:'#d9f99d' },
+    { label:'黄緑点滅', icon:'🟡✨', hint:'設定4以上濃厚',   bg:'rgba(80,140,0,0.35)',   border:'rgba(160,240,0,0.9)', color:'#d9f99d' },
+    { label:'金',       icon:'🟠', hint:'設定6濃厚',        bg:'rgba(160,100,0,0.3)',   border:'rgba(255,180,0,0.7)', color:'#fde68a' },
+  ],
+  C: [
+    { label:'水色',     icon:'🔵', hint:'規定G近い示唆(弱)',  bg:'rgba(30,100,180,0.3)',  border:'rgba(100,180,255,0.6)',color:'#bae6fd' },
+    { label:'黄緑',     icon:'🟡', hint:'規定G近い示唆(中)',  bg:'rgba(80,140,0,0.3)',    border:'rgba(160,240,0,0.7)', color:'#d9f99d' },
+    { label:'金',       icon:'🟠', hint:'規定G近い示唆(強)',  bg:'rgba(160,100,0,0.3)',   border:'rgba(255,180,0,0.7)', color:'#fde68a' },
+  ],
+};
+
+const selectedLamp = { s: null, a: null };
+
+function selectLamp(m, type) {
+  selectedLamp[m] = type;
+  // ボタンハイライト
+  ['A','B','C'].forEach(t => {
+    const btn = document.getElementById(`lamp-btn-${t}-${m}`);
+    if (btn) btn.classList.toggle('selected', t === type);
+  });
+  // パターン表示
+  const panel = document.getElementById(`lamp-panel-${m}`);
+  const title = document.getElementById(`lamp-panel-title-${m}`);
+  const pats  = document.getElementById(`lamp-patterns-${m}`);
+  panel.style.display = 'block';
+  const typeLabel = {A:'A（スピーカー）',B:'B（中央）',C:'C（サブ液晶）'};
+  title.textContent = `▼ ${typeLabel[type]}：点灯パターンを選択`;
+  const patterns = LAMP_PATTERNS[type];
+  pats.innerHTML = patterns.map(p =>
+    `<button class="btn-lamp-pat" style="background:${p.bg};border:1px solid ${p.border};color:${p.color};"
+      onclick="confirmLamp('${m}','${type}','${p.icon}','${p.label}','${p.hint}')">${p.icon} ${p.label}</button>`
+  ).join('');
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function confirmLamp(m, type, icon, label, hint) {
+  const g = counts[m];
+  const mLabel = m === 's' ? '⚙️' : '🎯';
+  const typeLabel2 = {A:'A(スピーカー)',B:'B(中央)',C:'C(サブ液晶)'};
+  const txt = `${mLabel}[${g}G] 💡${typeLabel2[type]}：${icon}${label}（${hint}）`;
+  const lineText = `${g} 💡${typeLabel2[type]}：${icon}${label}`;
+  logs.unshift({ g, m, txt, cls:'ll-lamp', lineText });
+  renderLiveLog();
+  // パネルを閉じる
+  document.getElementById(`lamp-panel-${m}`).style.display = 'none';
+  selectedLamp[m] = null;
+  ['A','B','C'].forEach(t => {
+    const btn = document.getElementById(`lamp-btn-${t}-${m}`);
+    if (btn) btn.classList.remove('selected');
+  });
+  const tl = {A:'A（スピーカー）',B:'B（中央）',C:'C（サブ液晶）'};
+  showToast(`${tl[type]}：${label}を記録しました`);
+}
+
+// ===== ボスバトル加算G数判別 =====
+const ZONES_ALL = ['32〜48','160〜176','288〜304','352〜368','416〜432','480〜496','608〜624','672〜688'];
+
+function openBoss(m) {
+  const panel = document.getElementById('boss-panel-' + m);
+  if (!panel) return;
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  if (panel.style.display === 'block') {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function confirmBoss(m, ref) {
+  const g = counts[m]; // 現在のあべし数（カウンター）をそのまま使う
+  const added = ref - g;
+  const mLabel = '⚙️';
+
+  if (added < 0) {
+    showToast('あべし数が基準Gより大きいです。確認してください');
+    return;
+  }
+
+  // ログに記録
+  const txt = mLabel + '[' + g + 'G] ⚔️ボスバトル終了（加算' + added + 'G確定）';
+  const lineText = g + ' ⚔️ボスバトル終了（加算' + added + 'G）';
+  logs.unshift({ txt: txt, cls: 'll-boss', g: g, m: m, lineText: lineText });
+  renderLiveLog();
+
+  // 設定変更後タブのゾーンボタンをズラす
+  ['s','a'].forEach(function(tab) {
+    var el = document.getElementById('zones-' + tab);
+    if (!el) return;
+    el.innerHTML = ZONES_ALL.map(function(z) {
+      var parts = z.split('〜');
+      var s = parseInt(parts[0]) - added;
+      var e = parseInt(parts[1]) - added;
+      var dispLabel = s > 0 ? (s + '〜' + e) : z;
+      if (SHUTTER_ZONES.includes(z)) {
+        return '<button class="btn-z btn-z-special" onclick="selectZoneShutter(\' + tab + \',\' + z + \')">' + dispLabel + '<br><span style="font-size:9px;opacity:0.7">シャッターあり/なし</span></button>';
+      }
+      if (BOSS_ZONES.includes(z)) {
+        return '<button class="btn-z btn-z-boss" onclick="logZone(\' + tab + \',\' + z + \')">' + dispLabel + '<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>';
+      }
+      return '<button class="btn-z" onclick="logZone(\' + tab + \',\' + z + \')">' + dispLabel + '</button>';
+    }).join('');
+  });
+
+  document.getElementById('boss-panel-' + m).style.display = 'none';
+  showToast(g + 'G ボスバトル終了！加算' + added + 'G確定・ゾーン補正済');
+}
+
+// ===== 天破の刻 =====
+function openTenpa(m) {
+  const panel = document.getElementById(`tenpa-panel-${m}`);
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  if (panel.style.display === 'block') {
+    document.getElementById(`tenpa-inp-${m}`).focus();
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function confirmTenpa(m) {
+  const inp = document.getElementById(`tenpa-inp-${m}`);
+  const newG = parseInt(inp.value, 10);
+  if (isNaN(newG) || newG < 0) { showToast('G数を入力してください'); return; }
+  const fromG = counts[m];
+  const mLabel = m === 's' ? '⚙️' : '🎯';
+  const txt = `${mLabel}[${fromG}G] 🌀天破の刻 → ${newG}Gへ移動`;
+  const lineText = `${fromG} 🌀天破の刻 → ${newG}Gへ移動`;
+  logs.unshift({ txt, cls: 'll-tenpa', g: fromG, m, lineText });
+  counts[m] = newG;
+  updateCnt(m);
+  renderLiveLog();
+  inp.value = '';
+  document.getElementById(`tenpa-panel-${m}`).style.display = 'none';
+  showToast(`${fromG}G → ${newG}Gへ移動しました`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Service Worker登録
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
