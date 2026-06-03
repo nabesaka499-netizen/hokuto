@@ -633,10 +633,12 @@ function loadState() {
 ['s','a'].forEach(m => {
   document.getElementById(`zones-${m}`).innerHTML =
     ZONES.map(z => {
+      const sg = parseInt(z.split('〜')[0], 10) + 8;
+      const shut = `<br><span style="font-size:9px;color:#fbbf24;opacity:0.95">${sg}（シャッター発生高確率）</span>`;
       if (BOSS_ZONES.includes(z)) {
-        return `<button class="btn-z btn-z-boss" onclick="logZone('${m}','${z}')">${z}<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>`;
+        return `<button class="btn-z btn-z-boss" onclick="logZone('${m}','${z}')">${z}<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span>${shut}</button>`;
       }
-      return `<button class="btn-z" onclick="logZone('${m}','${z}')">${z}</button>`;
+      return `<button class="btn-z" onclick="logZone('${m}','${z}')">${z}${shut}</button>`;
     }).join('');
   document.getElementById(`es-kakutei-${m}`).innerHTML =
     STRONG_KAKUTEI.map(n => `<button class="btn-e be-r" onclick="doLog('${m}','🔴','strong','${n}')">${n}</button>`).join('');
@@ -903,10 +905,12 @@ function clrLog() {
       var el = document.getElementById('zones-' + tab);
       if (!el) return;
       el.innerHTML = ZONES_ALL.map(function(z) {
+        var sg = parseInt(z.split('〜')[0], 10) + 8;
+        var shut = '<br><span style="font-size:9px;color:#fbbf24;opacity:0.95">' + sg + '（シャッター発生高確率）</span>';
         if (BOSS_ZONES.includes(z)) {
-          return '<button class="btn-z btn-z-boss" onclick="logZone(\'' + tab + '\',\'' + z + '\')">' + z + '<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>';
+          return '<button class="btn-z btn-z-boss" onclick="logZone(\'' + tab + '\',\'' + z + '\')">' + z + '<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span>' + shut + '</button>';
         }
-        return '<button class="btn-z" onclick="logZone(\'' + tab + '\',\'' + z + '\')">' + z + '</button>';
+        return '<button class="btn-z" onclick="logZone(\'' + tab + '\',\'' + z + '\')">' + z + shut + '</button>';
       }).join('');
     });
     showToast('ログをクリアしました');
@@ -1019,14 +1023,16 @@ function confirmBoss(m, ref) {
       var e = parseInt(parts[1]) - added;
       var newLabel = s > 0 ? (s + '〜' + e) : z;
       var prevLabel = s > 0 ? '（前:' + z + '）' : '';
+      var sg = (s > 0 ? s : parseInt(parts[0])) + 8;
+      var shut = '<br><span style="font-size:9px;color:#fbbf24;opacity:0.95">' + sg + '（シャッター発生高確率）</span>';
       if (BOSS_ZONES.includes(z)) {
         return '<button class="btn-z btn-z-boss" onclick="logZone(\'' + tab + '\',\'' + z + '\')">'
           + newLabel + '<br><span style="font-size:9px;opacity:0.8;color:#ffd700">' + prevLabel + '</span>'
-          + '<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>';
+          + '<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span>' + shut + '</button>';
       }
       return '<button class="btn-z" onclick="logZone(\'' + tab + '\',\'' + z + '\')">'
         + newLabel + (prevLabel ? '<br><span style="font-size:9px;opacity:0.8;color:#ffd700">' + prevLabel + '</span>' : '')
-        + '</button>';
+        + shut + '</button>';
     }).join('');
   });
 
