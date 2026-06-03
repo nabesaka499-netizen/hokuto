@@ -236,13 +236,6 @@ header {
 .btn-stage.active {
   background: rgba(100,200,255,0.2); border-color: rgba(100,200,255,0.7); color: #7dd3fc;
 }
-.btn-z-special {
-  border-color: rgba(255,150,0,0.6) !important;
-  background: rgba(150,80,0,0.4) !important;
-  color: #fbbf24 !important;
-  line-height: 1.3;
-  font-size: 12px !important;
-}
 .btn-z-boss {
   border-color: rgba(0,200,255,0.7) !important;
   background: rgba(0,80,150,0.45) !important;
@@ -274,7 +267,6 @@ header {
 
 <header style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;">
   <span style="font-size:11px;letter-spacing:3px;color:#c8a84b;font-weight:bold;">北斗転生2 ／ 示唆メモ</span>
-  <button onclick="openSampleEditor()" style="background:rgba(180,100,255,0.2);border:1px solid rgba(180,100,255,0.4);color:#c084fc;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:bold;cursor:pointer;">📊 サンプル</button>
 </header>
 
 <!-- ===== 常時表示ログ ===== -->
@@ -575,57 +567,6 @@ header {
 
 <div class="toast" id="toast"></div>
 
-<!-- サンプル編集モーダル -->
-<div id="sample-editor" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:100;overflow-y:auto;">
-  <div style="background:#0f0f1a;border:1px solid rgba(255,200,0,0.4);border-radius:16px;margin:40px auto;max-width:440px;padding:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <span style="font-size:14px;font-weight:bold;color:#ffd700;">📊 サンプルデータ編集</span>
-      <button onclick="closeSampleEditor()" style="background:rgba(200,80,80,0.3);border:1px solid rgba(200,80,80,0.5);color:#ff9090;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12px;">閉じる</button>
-    </div>
-    <p style="font-size:10px;color:#888;margin-bottom:14px;">サンプル数が増えたら数値を更新してください。</p>
-    <!-- 611〜624 -->
-    <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-bottom:12px;">
-      <div style="font-size:12px;font-weight:bold;color:#c084fc;margin-bottom:10px;">📍 611〜624</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div>
-          <div style="font-size:10px;color:#fca5a5;margin-bottom:4px;">🔴 シャッターあり</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
-            当選 <input id="se-611-624-ari-win" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
-            / <input id="se-611-624-ari-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;color:#ccc;margin-bottom:4px;">⬜ シャッターなし</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
-            超え <input id="se-611-624-nashi-lose" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
-            / <input id="se-611-624-nashi-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- 675〜688 -->
-    <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-bottom:16px;">
-      <div style="font-size:12px;font-weight:bold;color:#c084fc;margin-bottom:10px;">📍 675〜688</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div>
-          <div style="font-size:10px;color:#fca5a5;margin-bottom:4px;">🔴 シャッターあり</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
-            当選 <input id="se-675-688-ari-win" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
-            / <input id="se-675-688-ari-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;color:#ccc;margin-bottom:4px;">⬜ シャッターなし</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;">
-            超え <input id="se-675-688-nashi-lose" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;">
-            / <input id="se-675-688-nashi-tot" type="number" min="0" style="width:50px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:white;padding:4px;text-align:center;font-size:12px;"> 回
-          </div>
-        </div>
-      </div>
-    </div>
-    <button onclick="saveSampleData()" style="width:100%;background:rgba(0,200,80,0.3);border:1px solid rgba(0,200,80,0.6);color:#4ade80;border-radius:10px;padding:12px;font-size:14px;font-weight:bold;cursor:pointer;">💾 保存する</button>
-  </div>
-</div>
 
 <script>
 const ZONES  = ['35〜48','163〜176','291〜304','355〜368','419〜432','483〜496','611〜624','675〜688','803〜816'];
@@ -662,16 +603,7 @@ const WEAK_GROUPS = [
   { stage:'カサンドラ', items:['カサンドラ｜第3子供(牢屋)','カサンドラ｜第3兵士(扉)'] },
 ];
 
-// ===== サンプルデータ（611〜624 / 675〜688）=====
-let sampleData = {
-  '611〜624': { あり: { win:8, total:9 }, なし: { lose:4, total:4 } },
-  '675〜688': { あり: { win:0, total:0 }, なし: { lose:0, total:0 } },
-};
-
-// 特殊ゾーン（シャッターあり/なし選択）※611〜624/675〜688は通常ゾーン表記に変更したため空
-const SHUTTER_ZONES = [];
 const BOSS_ZONES = ['355〜368']; // ボスバトル発展で期待度50%
-const selectedZone = { s: null, a: null };
 
 const counts   = { s: 0, a: 0 };
 const logs     = [];
@@ -683,7 +615,6 @@ function saveState() {
   try {
     localStorage.setItem('hokuto_counts', JSON.stringify(counts));
     localStorage.setItem('hokuto_logs',   JSON.stringify(logs));
-    localStorage.setItem('hokuto_sample', JSON.stringify(sampleData));
     localStorage.setItem('hokuto_stage',  JSON.stringify(currentStage));
   } catch(e) {}
 }
@@ -691,11 +622,9 @@ function loadState() {
   try {
     const c = localStorage.getItem('hokuto_counts');
     const l = localStorage.getItem('hokuto_logs');
-    const s = localStorage.getItem('hokuto_sample');
     const st = localStorage.getItem('hokuto_stage');
     if (c) { const d=JSON.parse(c); counts.s=d.s||0; counts.a=d.a||0; }
     if (l) { const d=JSON.parse(l); logs.push(...d); }
-    if (s) { const d=JSON.parse(s); Object.assign(sampleData, d); }
     if (st) { const d=JSON.parse(st); currentStage.s=d.s||null; currentStage.a=d.a||null; }
   } catch(e) {}
 }
@@ -704,9 +633,6 @@ function loadState() {
 ['s','a'].forEach(m => {
   document.getElementById(`zones-${m}`).innerHTML =
     ZONES.map(z => {
-      if (SHUTTER_ZONES.includes(z)) {
-        return `<button class="btn-z btn-z-special" onclick="selectZoneShutter('${m}','${z}')">${z}<br><span style="font-size:9px;opacity:0.7">シャッターあり/なし</span></button>`;
-      }
       if (BOSS_ZONES.includes(z)) {
         return `<button class="btn-z btn-z-boss" onclick="logZone('${m}','${z}')">${z}<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>`;
       }
@@ -887,72 +813,6 @@ function logZone(m, label) {
   renderLiveLog();
 }
 
-function selectZoneShutter(m, zone) {
-  selectedZone[m] = zone;
-  // パネル表示
-  const panel = document.getElementById(`shutter-panel-${m}`);
-  const title = document.getElementById(`shutter-title-${m}`);
-  if (!panel) return;
-  const sd = sampleData[zone];
-  const ariTxt  = sd.あり.total > 0 ? `${sd.あり.win}/${sd.あり.total}` : 'データなし';
-  const nashiTxt = sd.なし.total > 0 ? `${sd.なし.lose}/${sd.なし.total}超え` : 'データなし';
-  title.textContent = `▼ ${zone}：シャッターを選択`;
-  document.getElementById(`shutter-ari-stat-${m}`).textContent  = `サンプル: ${ariTxt}`;
-  document.getElementById(`shutter-nashi-stat-${m}`).textContent = `サンプル: ${nashiTxt}`;
-  panel.style.display = 'block';
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function confirmShutter(m, type) {
-  const zone = selectedZone[m]; if (!zone) return;
-  const mLabel = m === 's' ? '⚙️' : '🎯';
-  const g = counts[m];
-  const sd = sampleData[zone];
-  let txt, lineText;
-  if (type === 'あり') {
-    const stat = sd.あり.total > 0 ? ` (${sd.あり.win}/${sd.あり.total}当選)` : '';
-    txt = `${mLabel}[${g}G] 📍${zone} 🔴シャッターあり${stat}（896以内ほぼ確定）`;
-    lineText = `${g} 📍${zone} 🔴シャッターあり${stat}`;
-  } else {
-    const stat = sd.なし.total > 0 ? ` (${sd.なし.lose}/${sd.なし.total}超え)` : '';
-    txt = `${mLabel}[${g}G] 📍${zone} ⬜シャッターなし${stat}（896抜け高確率）`;
-    lineText = `${g} 📍${zone} ⬜シャッターなし${stat}`;
-  }
-  logs.unshift({ txt, cls: 'll-new', g, m, lineText });
-  renderLiveLog();
-  document.getElementById(`shutter-panel-${m}`).style.display = 'none';
-  selectedZone[m] = null;
-}
-
-// ===== サンプル編集 =====
-function openSampleEditor() {
-  document.getElementById('sample-editor').style.display = 'block';
-  updateSampleEditor();
-}
-function closeSampleEditor() {
-  document.getElementById('sample-editor').style.display = 'none';
-}
-function updateSampleEditor() {
-  ['611〜624','675〜688'].forEach(zone => {
-    const sd = sampleData[zone];
-    const key = zone.replace('〜','-');
-    document.getElementById(`se-${key}-ari-win`).value   = sd.あり.win;
-    document.getElementById(`se-${key}-ari-tot`).value   = sd.あり.total;
-    document.getElementById(`se-${key}-nashi-lose`).value = sd.なし.lose;
-    document.getElementById(`se-${key}-nashi-tot`).value  = sd.なし.total;
-  });
-}
-function saveSampleData() {
-  ['611〜624','675〜688'].forEach(zone => {
-    const key = zone.replace('〜','-');
-    sampleData[zone].あり.win    = parseInt(document.getElementById(`se-${key}-ari-win`).value)||0;
-    sampleData[zone].あり.total  = parseInt(document.getElementById(`se-${key}-ari-tot`).value)||0;
-    sampleData[zone].なし.lose   = parseInt(document.getElementById(`se-${key}-nashi-lose`).value)||0;
-    sampleData[zone].なし.total  = parseInt(document.getElementById(`se-${key}-nashi-tot`).value)||0;
-  });
-  closeSampleEditor();
-  showToast('サンプルデータを更新しました！');
-}
 
 // ===== レア役選択フロー =====
 function selectRare(m, rareName) {
@@ -1043,10 +903,6 @@ function clrLog() {
       var el = document.getElementById('zones-' + tab);
       if (!el) return;
       el.innerHTML = ZONES_ALL.map(function(z) {
-        if (SHUTTER_ZONES.includes(z)) {
-          return '<button class="btn-z btn-z-special" onclick="selectZoneShutter(\'' + tab + '\',\'' + z + '\')">'
-              + z + '<br><span style="font-size:9px;opacity:0.7">シャッターあり/なし</span></button>';
-        }
         if (BOSS_ZONES.includes(z)) {
           return '<button class="btn-z btn-z-boss" onclick="logZone(\'' + tab + '\',\'' + z + '\')">' + z + '<br><span style="font-size:9px;opacity:0.8">ボスBT発展 期待度50%</span></button>';
         }
@@ -1163,11 +1019,6 @@ function confirmBoss(m, ref) {
       var e = parseInt(parts[1]) - added;
       var newLabel = s > 0 ? (s + '〜' + e) : z;
       var prevLabel = s > 0 ? '（前:' + z + '）' : '';
-      if (SHUTTER_ZONES.includes(z)) {
-        return '<button class="btn-z btn-z-special" onclick="selectZoneShutter(\'' + tab + '\',\'' + z + '\')">'
-          + newLabel + '<br><span style="font-size:9px;opacity:0.8;color:#ffd700">' + prevLabel + '</span>'
-          + '<br><span style="font-size:9px;opacity:0.7">シャッターあり/なし</span></button>';
-      }
       if (BOSS_ZONES.includes(z)) {
         return '<button class="btn-z btn-z-boss" onclick="logZone(\'' + tab + '\',\'' + z + '\')">'
           + newLabel + '<br><span style="font-size:9px;opacity:0.8;color:#ffd700">' + prevLabel + '</span>'
